@@ -1,0 +1,75 @@
+-- Consulta 1: Produtos com preço acima de 1000 na categoria "Super Luxo"
+SELECT 
+    p.nome AS nome_produto, 
+    f.nome AS fornecedor_nome, 
+    p.preco AS preco_do_produto
+FROM 
+    categorias c
+JOIN 
+    produtos p ON c.id = p.id_categoria
+JOIN 
+    fornecedores f ON p.id_fornecedor = f.id
+WHERE 
+    c.nome LIKE 'Super Luxo'
+    AND p.preco > 1000;
+
+-- Consulta 2: Valor mais recorrente na tabela de valores
+SELECT 
+    valor_frequente AS valor_mais_comum
+FROM (
+    SELECT 
+        valor AS valor_frequente, 
+        COUNT(*) AS ocorrencias
+    FROM 
+        tabela_valores
+    GROUP BY 
+        valor
+    ORDER BY 
+        ocorrencias DESC, valor ASC
+    LIMIT 1
+) subquery;
+
+-- Consulta 3: Contagem de marcas por temperatura reorganizada
+SELECT 
+    r.temperatura AS nivel_temperatura, 
+    COUNT(*) AS total_marcas_unicas
+FROM 
+    registros r
+GROUP BY 
+    r.temperatura
+HAVING 
+    COUNT(DISTINCT r.marca) > 0
+ORDER BY 
+    nivel_temperatura ASC;
+
+-- Consulta 4: Pacotes com condições específicas e endereços fora de Taiwan
+SELECT 
+    pk.ano AS ano_envio, 
+    rem.nome AS remetente_nome, 
+    dest.nome AS destinatario_nome
+FROM 
+    pacotes pk
+LEFT JOIN 
+    usuarios rem ON pk.id_remetente = rem.id
+LEFT JOIN 
+    usuarios dest ON pk.id_destinatario = dest.id
+WHERE 
+    (pk.cor IN ('azul') OR pk.ano = 2015)
+    AND rem.endereco NOT LIKE 'Taiwan'
+    AND dest.endereco NOT LIKE 'Taiwan'
+ORDER BY 
+    pk.ano DESC;
+
+-- Consulta 5: Calculando preços com base no tipo de produto
+SELECT 
+    p.nome AS produto_nome, 
+    CASE 
+        WHEN p.tipo = 'A' THEN CAST(20.0 AS DECIMAL(10,2))
+        WHEN p.tipo = 'B' THEN CAST(70.0 AS DECIMAL(10,2))
+        WHEN p.tipo = 'C' THEN CAST(530.5 AS DECIMAL(10,2))
+        ELSE CAST(0.0 AS DECIMAL(10,2))
+    END AS preco_definido
+FROM 
+    produtos p
+ORDER BY 
+    p.id DESC, p.tipo ASC;
